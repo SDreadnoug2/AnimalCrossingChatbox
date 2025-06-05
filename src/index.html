@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitch Chat</title>
+</head>
+<link rel="stylesheet" href="index.css"/>
+<body class="page">
+    <div class="textbox">
+    </div>
+    <template id="message-template">
+    <div class="textbox">
+        <div class="message__container">
+            <h1 class="message__user"></h1>                
+            <div class="message__blobs">
+                <div class="blob-top" id="top">
+                </div>
+                <div class="blob-bottom" id="bottom"></div>   
+            </div>
+            <p class="message__content" id="text"></p>            
+        </div>
+    </div>
+    </template>
+    <script src="scripts/message.js"></script>
+    <script src="scripts/tmi.min.js"></script>
+    <script src="scripts/script.js"></script>
+</body>
+</html>
