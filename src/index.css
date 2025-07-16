@@ -16,6 +16,11 @@
     height: 1000px;
 }
 
+.emote{
+  height: 1.53em;
+  vertical-align: middle;
+}
+
 .message__container{
   background: transparent;
   padding: 1.5rem;

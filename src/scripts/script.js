@@ -1,11 +1,50 @@
+// create emote vars.
+let globalEmotes = null;
+let userEmotes = null;
+const thirdPartyEmotes = '7tv';
+const emoteMap = new Map();
+// fetch emotes. Need 3rd party dependent. Has to check if user has an AuthCode.
+// If no auth, chatbox shouldn't work, should instead display "please sign in."
+async function setInstanceEmotes(id) {
+	if(thirdPartyEmotes == '7tv'){
+		const emoteArray = await getSevenTVEmotes(id);
+		for (const emote of emoteArray){
+			try {
+				const url = `https://cdn.7tv.app/emote/${emote.id}/${emote.data.host.files[2].name}`
+				emoteMap.set(emote.name, url);
+			} catch (error) {
+			console.error("Issue converting given ID to image link.");
+			}
+		}
+	}
+	console.log(emoteMap);
+}
 
+function parseMessage(msg) {
+	return msg.split(" ")
+	.map(word => {
+		if(emoteMap.has(word)) {
+			const url = emoteMap.get(word);
+			return `<img src="${url}" alt="${word}" class="emote" />`;
+		}
+		return word;
+	})
+	.join(" ");
+}
+
+// Run set emotes function
+setInstanceEmotes('01GFR72MHG0002DWWCWRYATM3H');
+// Create Chat Client
 const client = new tmi.Client({
-	channels: [ 'ironmouse' ]
+	channels: [ 'obkatiekat' ]
 });
 client.connect();
 const msgList = [];
+
+// Chat messagelimit before disappearing. 
 const msgLimit = 3;
 
+// Chat member Colors
 const colorArray = [
   { "#ff9980": "#e62e00" },
   { "#99ccff": "#0073e6" },
@@ -22,60 +61,30 @@ const randomColor = () => {
   return [key, value];
 };
 
-const container = document.querySelector(".textbox");
+//Message Instantiation and Parsing
 client.on('message', (channel, tags, message, self) => {
+	//nothing check, necessary for tmi I think?
 	if(self) return;
-	let parsedMessage = message;
-	const emotes = tags.emotes;
-
-	if (emotes) {
-		const ranges = [];
-
-		// Collect emote ranges
-		for (const id in emotes) {
-			emotes[id].forEach(range => {
-				const [start, end] = range.split('-').map(Number);
-				ranges.push({ start, end, id });
-			});
-		}
-
-		// Sort ranges in reverse to replace from the end
-		ranges.sort((a, b) => b.start - a.start);
-
-		// Replace emote text with image
-		ranges.forEach(({ start, end, id }) => {
-			const emoteUrl = `https://static-cdn.jtvnw.net/emoticons/v2/${id}/default/dark/1.0`;
-			const imgTag = `<img src="${emoteUrl}" alt="emote" class="emote">`;
-			parsedMessage = 
-				parsedMessage.slice(0, start) + imgTag + parsedMessage.slice(end + 1);
-		});
-	}
-
-	const msg = new Message(tags['display-name'], parsedMessage, randomColor());
+	const parsed = parseMessage(message);
+	console.log(parsed);
+	const msg = new Message(tags['display-name'], parsed, randomColor());
 	msgList.push(msg);
-	console.log(`${tags['display-name']}: ${message}`);
 	if(msgList.length > msgLimit){
 		const removed = msgList.shift();
 		removed.element.remove();
 	}
 
 	msgList.forEach((msg, i) => {
-		console.log(msg.textHeight);
-		const bottomBubbleHeight = msg.textHeight * 0.6;
-		const topBubbleHeight = msg.textHeight * 0.8;
-		console.log(msg.top);
-		if(msg.textHeight > 1){
-		msg.top.style.height = topBubbleHeight;
-		msg.bottom.style.height = bottomBubbleHeight;
-		}
 		msg.element.classList.remove("scale");
 		msg.element.classList.remove("bounce");
 		if(i === msgList.length - 1){
+			//With this style I think you could do something that determines how far up the list an item is,
+			// The further up it is, the less/more bouncy it gets.
 			msg.element.classList.add("scale");
 		} else {
 			msg.element.classList.add("bounce");
 		}
-		container.appendChild(msg.element);
+		document.querySelector(".textbox").appendChild(msg.element);
 
 
 	});
