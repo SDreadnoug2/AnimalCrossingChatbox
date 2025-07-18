@@ -1,13 +1,20 @@
+
+//global vars these need to be settings.
+const channelName = 'kymaniklowni'
+const sevenTVId = '01HNS2ENE8000EXZQWSVKBCSJ7';
+const bTTVId = '';
+const thirdPartyEmotes = '7tv';
+const globalEmotesOn = false;
 // create emote vars.
 let globalEmotes = null;
 let userEmotes = null;
-const thirdPartyEmotes = '7tv';
 const emoteMap = new Map();
+
 // fetch emotes. Need 3rd party dependent. Has to check if user has an AuthCode.
 // If no auth, chatbox shouldn't work, should instead display "please sign in."
-async function setInstanceEmotes(id) {
+async function setInstanceEmotes() {
 	if(thirdPartyEmotes == '7tv'){
-		const emoteArray = await getSevenTVEmotes(id);
+		const emoteArray = await getSevenTVEmotes(sevenTVId);
 		for (const emote of emoteArray){
 			try {
 				const url = `https://cdn.7tv.app/emote/${emote.id}/${emote.data.host.files[2].name}`
@@ -17,26 +24,37 @@ async function setInstanceEmotes(id) {
 			}
 		}
 	}
+	if(thirdPartyEmotes === 'bttv'){
+		const emoteArray = await getBttvEmotes('twitch', channelName);
+		console.log(emoteArray)
+	}
 	console.log(emoteMap);
 }
-
-function parseMessage(msg) {
-	return msg.split(" ")
-	.map(word => {
-		if(emoteMap.has(word)) {
-			const url = emoteMap.get(word);
-			return `<img src="${url}" alt="${word}" class="emote" />`;
+/*
+function addEmotes(array){
+	for (const emote of array){
+		try {
+			const url = 
 		}
+	}
+}
+*/
+function parseMessage(msg) {
+	return msg.match(/(\w+['’]?\w+|[^\s]+)/g).map(word => {
+    const cleaned = word.replace(/[^\w'’]+$/g, '');
+    if (emoteMap.has(cleaned)) {
+      const url = emoteMap.get(cleaned);
+      return `<img src="${url}" alt="${cleaned}" class="emote" />` + word.slice(cleaned.length);
+    }
 		return word;
 	})
 	.join(" ");
 }
 
-// Run set emotes function
-setInstanceEmotes('01GFR72MHG0002DWWCWRYATM3H');
+
 // Create Chat Client
 const client = new tmi.Client({
-	channels: [ 'obkatiekat' ]
+	channels: [channelName]
 });
 client.connect();
 const msgList = [];
@@ -64,6 +82,7 @@ const randomColor = () => {
 //Message Instantiation and Parsing
 client.on('message', (channel, tags, message, self) => {
 	//nothing check, necessary for tmi I think?
+	console.log(message, tags, self);
 	if(self) return;
 	const parsed = parseMessage(message);
 	console.log(parsed);
@@ -84,8 +103,12 @@ client.on('message', (channel, tags, message, self) => {
 		} else {
 			msg.element.classList.add("bounce");
 		}
-		document.querySelector(".textbox").appendChild(msg.element);
+		document.querySelector(".page").appendChild(msg.element);
 
 
 	});
 });
+
+
+// Run set emotes function
+setInstanceEmotes();

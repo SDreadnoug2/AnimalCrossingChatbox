@@ -7,20 +7,15 @@
 </head>
 <link rel="stylesheet" href="index.css"/>
 <body class="page">
-    <div class="textbox">
-    </div>
     <template id="message-template">
-    <div class="textbox">
         <div class="message__container">
             <h1 class="message__user"></h1>                
-            <div class="message__blobs">
-                <div class="blob-top" id="top">
-                </div>
-                <div class="blob-bottom" id="bottom"></div>   
+            <div class="message__blob">
+                <div class="message__content" id="text"></div> 
+                <div class="message__blob_under"></div>   
             </div>
-            <div class="message__content" id="text"></div>            
+
         </div>
-    </div>
     </template>
     <script src="scripts/api.js"></script>
     <script src="scripts/message.js"></script>

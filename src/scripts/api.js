@@ -5,3 +5,12 @@ async function getSevenTVEmotes(emoteSetId){
   return jsonify.emotes;
 }
 
+async function getBttvEmotes(platform, channel){
+  fetch(`https://api.ivr.fi/v2/twitch/user?login=${channel}`)
+    .then(res => res.json())
+    .then(data => {
+      const userId = data.id;
+      return fetch(`https://api.betterttv.net/3/cached/users/twitch/${userId}`);})
+    .then(res.json())
+}
+

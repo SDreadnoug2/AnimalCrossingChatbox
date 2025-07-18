@@ -1,19 +1,22 @@
+:root {
+  --fade-duration: 1s;
+}
+
 @font-face {
     font-family: 'Rodin Bokutoh EB';
     src: url('../fonts/FOT-RodinBokutohProEB.otf');
 }
 
 .page{
-    max-width: 100vw;
-    max-height: 100vh;
+    width: 100vw;
+    height: 100vh;
     font-family: 'Rodin Bokutoh EB', sans-serif;
     color: #74664b;
     background-color: black;
-}
-
-.textbox{
-    width: 1000px;
-    height: 1000px;
+    z-index: -9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
 .emote{
@@ -30,10 +33,35 @@
   position: relative;
   display:flex;
   flex-direction: column;
+  align-items: center;
+  opacity: 1;
+  transition: opacity var(--fade-duration) ease;
+}
+
+.message__blob{
+  background: #fdf8e3;
+  border-radius: 80% 80% 30% 30% / 150% 150% 150% 150%;
+  min-height: 150px;
+  width: 100%;
+  animation: blob 2s ease-in-out infinite alternate;
+  position: relative;
+  margin: 0;
+}
+
+.message__blob_under{
+  background: #fdf8e3;
+  border-radius: 80% 80% 30% 30% / 150% 150% 150% 150%;
+  width: 100%;
+  height: 60%;
+  animation: blob 2s ease-in-out infinite alternate;
+  transform: translateY(0px);
+  position: absolute;
+  bottom: 0;
+  z-index: -1;
+  margin: 0;
 }
 
 .message__user{
-  background: #e5ed4b;
   color:  #c1ac23;
   font-weight: 100;
   font-size: 20px;
@@ -44,37 +72,17 @@
   z-index: 1;
   align-self: flex-start;
   position: absolute;
-  transform: rotate(-5deg) translateY(-20px) translateX(20px);
+  transform: rotate(-5deg) translateY(-30px) translateX(20px);
   flex: 0 0 auto;
   width: auto;
 }
 
-.message__content{
+.message__content {
   font-size: 1.5rem;
   color: #807256;
   line-height: 1.5;
   padding: 50px;
-  z-index: 999;
-  position: absolute;
-  align-self: center;
-}
-
-.message__blobs{
-}
-
-.blob-top {
-  background: #fdf8e3;
-  border-radius: 80% 80% 30% 30% / 150% 150% 150% 150%;
-  min-height: 150px;
-  animation: blob 2s ease-in-out infinite alternate;
-}
-
-.blob-bottom {
-  margin-top: -30px;
-  background: #fdf8e3;
-  border-radius: 5% 5% 20% 20% / 100% 100% 100% 100%;
-  height: 60px;
-  animation: blob 1.5s ease-in-out infinite alternate;
+  text-align: center;
 }
 
 .bounce {
@@ -108,4 +116,8 @@
   to {
     transform: scale(0.98) rotate(0.3deg);
   }
+}
+
+.fade-out {
+  opacity: 0;
 }

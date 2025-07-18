@@ -7,3 +7,12 @@
     4. Use the token in api calls.
 
 - For BTTV, it should be a bit simpler which I think is why I was trying to implement that first. 
+    - BTTV needs ouath token to get the id.
+
+- At this point, I should just make a site for oAuth or something.
+- You need a back end app, and front end that gives user a settings.json file.
+
+
+Other things I can do
+- Have opacity decrease after set time.
+- Need to add a check if image is loading / if just sent a single emote needs to be larger.

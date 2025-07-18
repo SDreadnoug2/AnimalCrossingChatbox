@@ -1,3 +1,4 @@
+
 class Message {
   constructor(user, message, color) {
     const template = document.getElementById("message-template");
