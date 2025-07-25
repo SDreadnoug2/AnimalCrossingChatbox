@@ -1,44 +1,50 @@
 
 //global vars these need to be settings.
 const channelName = 'kymaniklowni'
-const sevenTVId = '01HNS2ENE8000EXZQWSVKBCSJ7';
-const bTTVId = '';
-const thirdPartyEmotes = '7tv';
+const sevenTVId = '01G28935KG0008VANM5HZ9841J';
+const ffzId = '';
+const ffz = false;
+const bttv = true;
+const sevenTV = true;
 const globalEmotesOn = false;
+
+let twitchId = '';
+
 // create emote vars.
 let globalEmotes = null;
 let userEmotes = null;
 const emoteMap = new Map();
 
+
+
 // fetch emotes. Need 3rd party dependent. Has to check if user has an AuthCode.
 // If no auth, chatbox shouldn't work, should instead display "please sign in."
 async function setInstanceEmotes() {
-	if(thirdPartyEmotes == '7tv'){
+	if(sevenTV === true){
 		const emoteArray = await getSevenTVEmotes(sevenTVId);
 		for (const emote of emoteArray){
 			try {
 				const url = `https://cdn.7tv.app/emote/${emote.id}/${emote.data.host.files[2].name}`
+				console.log("7tv emotes: " + emoteArray);
 				emoteMap.set(emote.name, url);
 			} catch (error) {
 			console.error("Issue converting given ID to image link.");
 			}
 		}
 	}
-	if(thirdPartyEmotes === 'bttv'){
-		const emoteArray = await getBttvEmotes('twitch', channelName);
-		console.log(emoteArray)
-	}
-	console.log(emoteMap);
-}
-/*
-function addEmotes(array){
-	for (const emote of array){
-		try {
-			const url = 
-		}
+	if(bttv === true){
+		const emoteArray = await getBttvEmotes(twitchId);
+		console.log(emoteArray);
+		
 	}
 }
-*/
+
+async function init() {
+	twitchId = await setChannelId(channelName);
+	console.log(twitchId);
+	await setInstanceEmotes();
+}
+
 function parseMessage(msg) {
 	return msg.match(/(\w+['’]?\w+|[^\s]+)/g).map(word => {
     const cleaned = word.replace(/[^\w'’]+$/g, '');
@@ -79,13 +85,14 @@ const randomColor = () => {
   return [key, value];
 };
 
+// Run init.
+init();
+
 //Message Instantiation and Parsing
 client.on('message', (channel, tags, message, self) => {
 	//nothing check, necessary for tmi I think?
-	console.log(message, tags, self);
-	if(self) return;
+	if (self) return;
 	const parsed = parseMessage(message);
-	console.log(parsed);
 	const msg = new Message(tags['display-name'], parsed, randomColor());
 	msgList.push(msg);
 	if(msgList.length > msgLimit){
@@ -96,7 +103,7 @@ client.on('message', (channel, tags, message, self) => {
 	msgList.forEach((msg, i) => {
 		msg.element.classList.remove("scale");
 		msg.element.classList.remove("bounce");
-		if(i === msgList.length - 1){
+		if (i === msgList.length - 1) {
 			//With this style I think you could do something that determines how far up the list an item is,
 			// The further up it is, the less/more bouncy it gets.
 			msg.element.classList.add("scale");
@@ -110,5 +117,3 @@ client.on('message', (channel, tags, message, self) => {
 });
 
 
-// Run set emotes function
-setInstanceEmotes();
