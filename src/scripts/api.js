@@ -11,6 +11,18 @@ async function getBttvEmotes(channel){
   return jsonify.sharedEmotes.concat(jsonify.channelEmotes);
 };
 
+async function getFfzEmotes(channel){
+  const data = await fetch(`https://api.betterttv.net/3/cached/users/twitch/${channel}`)
+  const jsonify = await data.json();
+  return jsonify.sharedEmotes.concat(jsonify.channelEmotes);
+};
+
+async function getTwitchEmotes(channelId){
+	const data = await fetch(`https://api.twitchemotes.com/api/v4/channels/${channelId}`);
+	const jsonify = await data.json();
+	return jsonify;
+}
+
 async function setChannelId(channelName) {
   console.log(channelName);
 	await fetch(`https://api.ivr.fi/v2/twitch/user?login=${channelName}`)

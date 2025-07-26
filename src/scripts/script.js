@@ -1,7 +1,7 @@
 
 //global vars these need to be settings.
-const channelName = 'kymaniklowni'
-const sevenTVId = '01G28935KG0008VANM5HZ9841J';
+const channelName = 'kumi'
+const sevenTVId = '01H5NB6HD8000E7KD49C195E8P';
 const ffzId = '';
 const ffz = false;
 const bttv = true;
@@ -15,47 +15,78 @@ let globalEmotes = null;
 let userEmotes = null;
 const emoteMap = new Map();
 
-
-
-// fetch emotes. Need 3rd party dependent. Has to check if user has an AuthCode.
-// If no auth, chatbox shouldn't work, should instead display "please sign in."
-async function setInstanceEmotes() {
-	if(sevenTV === true){
-		const emoteArray = await getSevenTVEmotes(sevenTVId);
-		for (const emote of emoteArray){
-			try {
-				const url = `https://cdn.7tv.app/emote/${emote.id}/${emote.data.host.files[2].name}`
-				console.log("7tv emotes: " + emoteArray);
-				emoteMap.set(emote.name, url);
-			} catch (error) {
-			console.error("Issue converting given ID to image link.");
+async function getEmotes(source, service) {
+	const emoteArray = await source;
+	let url;
+	let name;
+	for (const emote of emoteArray) {
+		try {
+			if(service === 'bttv'){
+				url = `https://cdn.betterttv.net/emote/${emote.id}/1x`;
+				name = emote.code;
 			}
-		}
+			if(service === '7tv'){
+				url = `https://cdn.7tv.app/emote/${emote.id}/${emote.data.host.files[2].name}`
+				name = emote.name;
+			}
+			if(service === 'ffz'){
+				url = "#";
+			}
+			emoteMap.set(name, url);
+		} catch (error) {
+		console.error("Issue converting given ID to image link: " + error);
+	}
+}
+};
+
+async function setInstanceEmotes() {
+	const promises = [];
+	if(sevenTV === true){
+		promises.push(getEmotes(getSevenTVEmotes(sevenTVId), "7tv"));
 	}
 	if(bttv === true){
-		const emoteArray = await getBttvEmotes(twitchId);
-		console.log(emoteArray);
-		
+		promises.push(getEmotes(getBttvEmotes(twitchId), "bttv"));
 	}
+	if(ffz === true){
+		promises.push(getEmotes(getFfzEmotes(twitchId), "ffz"));
+	}
+	promises.push(getTwitchEmotes(twitchId));
+	await Promise.all(promises);
+
 }
 
 async function init() {
 	twitchId = await setChannelId(channelName);
-	console.log(twitchId);
 	await setInstanceEmotes();
+	console.log(emoteMap);
 }
-
+/*
 function parseMessage(msg) {
 	return msg.match(/(\w+['’]?\w+|[^\s]+)/g).map(word => {
     const cleaned = word.replace(/[^\w'’]+$/g, '');
+	console.log(cleaned);
     if (emoteMap.has(cleaned)) {
       const url = emoteMap.get(cleaned);
+	  console.log("Adding emote to message: " + msg + ". Emote: " + cleaned);
       return `<img src="${url}" alt="${cleaned}" class="emote" />` + word.slice(cleaned.length);
     }
 		return word;
 	})
 	.join(" ");
+}*/
+function parseMessage(msg) {
+	return msg.match(/\S+/g).map(word => {
+		const match = word.match(/^(\w+['’]?\w*|\w+)(\W*)$/);
+		if (!match) return word;
+		const [_, base, punctuation] = match;
+		if (emoteMap.has(base)) {
+			const url = emoteMap.get(base);
+			return `<img src="${url}" alt="${base}" class="emote" />${punctuation}`;
+		}
+		return word;
+	}).join(" ");
 }
+
 
 
 // Create Chat Client
