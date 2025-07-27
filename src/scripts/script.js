@@ -123,6 +123,8 @@ init();
 client.on('message', (channel, tags, message, self) => {
 	//nothing check, necessary for tmi I think?
 	if (self) return;
+	
+	console.log(tags, message);
 	const parsed = parseMessage(message);
 	const msg = new Message(tags['display-name'], parsed, randomColor());
 	msgList.push(msg);
